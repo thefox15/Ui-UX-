@@ -68,6 +68,27 @@ const Hero = () => (
   </section>
 );
 
+const About = () => (
+  <section id="about" className="px-6 max-w-3xl mx-auto mt-12">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      className="bg-surface-container-low p-8 rounded-2xl space-y-4 relative overflow-hidden group"
+    >
+      <div className="relative z-10">
+        <span className="text-xs font-bold uppercase tracking-widest text-on-tertiary-container mb-2 block">Technical Expertise</span>
+        <p className="text-secondary leading-relaxed">
+          My technical foundation is built on a deep understanding of <span className="text-primary font-semibold">Frontend Development</span> and <span className="text-on-tertiary-container font-semibold">UI/UX Design</span>. I specialize in crafting performant web and mobile applications using React and React Native, ensuring that every interface is not only visually stunning but also technically robust. From architecting complex state management systems to fine-tuning micro-interactions, I leverage a diverse toolkit to build products that are as functional as they are beautiful.
+        </p>
+      </div>
+      <div className="absolute -top-12 -right-12 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform duration-700">
+        <Code2 size={160} strokeWidth={1} />
+      </div>
+    </motion.div>
+  </section>
+);
+
 const Skills = () => {
   const skills = [
     { name: "UI/UX Design", icon: <Figma size={18} /> },
@@ -103,7 +124,7 @@ const Skills = () => {
 };
 
 const Projects = ({ onOpenCaseStudy }: { onOpenCaseStudy: () => void }) => (
-  <section className="px-6 max-w-3xl mx-auto mt-20 space-y-8">
+  <section id="projects" className="px-6 max-w-3xl mx-auto mt-20 space-y-8">
     <div className="flex items-end justify-between">
       <h2 className="text-2xl font-bold tracking-tight">Featured Work</h2>
       <button className="text-on-tertiary-container text-sm font-semibold flex items-center gap-1 hover:underline transition-all">
@@ -219,20 +240,47 @@ const BottomNav = ({ view, setView }: { view: string, setView: (v: string) => vo
   <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-md z-50">
     <div className="bg-surface-container-lowest/80 backdrop-blur-2xl border border-outline-variant/20 rounded-3xl shadow-2xl shadow-primary/5 px-8 py-4 flex justify-between items-center">
       <button 
-        onClick={() => setView('home')}
+        onClick={() => {
+          if (view === 'home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+            setView('home');
+          }
+        }}
         className={`flex flex-col items-center gap-1 transition-all ${view === 'home' ? 'text-on-tertiary-container scale-110' : 'text-secondary opacity-60'}`}
       >
         <Home size={20} strokeWidth={view === 'home' ? 2.5 : 2} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Home</span>
       </button>
       <button 
-        onClick={() => setView('case-study')}
+        onClick={() => {
+          if (view === 'home') {
+            document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            setView('home');
+            setTimeout(() => {
+              document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }
+        }}
         className={`flex flex-col items-center gap-1 transition-all ${view === 'case-study' ? 'text-on-tertiary-container scale-110' : 'text-secondary opacity-60'}`}
       >
         <FolderOpen size={20} strokeWidth={view === 'case-study' ? 2.5 : 2} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Projects</span>
       </button>
-      <button className="flex flex-col items-center gap-1 text-secondary opacity-60 hover:opacity-100 transition-opacity">
+      <button 
+        onClick={() => {
+          if (view !== 'home') {
+            setView('home');
+            setTimeout(() => {
+              document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          } else {
+            document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+        className="flex flex-col items-center gap-1 text-secondary opacity-60 hover:opacity-100 transition-opacity"
+      >
         <User size={20} />
         <span className="text-[10px] font-bold uppercase tracking-wider">About</span>
       </button>
@@ -599,6 +647,7 @@ export default function App() {
             className="pb-32"
           >
             <Hero />
+            <About />
             <Skills />
             <Projects onOpenCaseStudy={() => setView('case-study')} />
             <Contact />
