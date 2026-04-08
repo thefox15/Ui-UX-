@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Menu, 
+  X,
   Terminal, 
   ArrowRight, 
   Home, 
@@ -28,7 +29,7 @@ import {
   Linkedin
 } from "lucide-react";
 
-const Header = ({ view, setView }: { view: string, setView: (v: string) => void }) => (
+const Header = ({ view, setView, setIsMenuOpen }: { view: string, setView: (v: string) => void, setIsMenuOpen: (o: boolean) => void }) => (
   <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10">
     <div className="flex justify-between items-center px-6 py-4 max-w-3xl mx-auto w-full">
       <button 
@@ -38,14 +39,113 @@ const Header = ({ view, setView }: { view: string, setView: (v: string) => void 
         {view === 'case-study' && <ArrowLeft size={20} />}
         Biswashanti.M
       </button>
-      <button className="text-primary opacity-80 hover:opacity-100 transition-all">
+      <button 
+        onClick={() => setIsMenuOpen(true)}
+        className="text-primary opacity-80 hover:opacity-100 transition-all"
+      >
         <Menu size={24} />
       </button>
     </div>
   </header>
 );
 
-const Hero = () => (
+const MenuOverlay = ({ 
+  isOpen, 
+  onClose, 
+  setView, 
+  currentView 
+}: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  setView: (v: string) => void,
+  currentView: string
+}) => {
+  const navItems = [
+    { label: "Home", id: "home", action: () => { setView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+    { label: "About", id: "about", action: () => { 
+      if (currentView !== 'home') {
+        setView('home');
+        setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100);
+      } else {
+        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }},
+    { label: "Projects", id: "projects", action: () => { 
+      if (currentView !== 'home') {
+        setView('home');
+        setTimeout(() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }), 100);
+      } else {
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }},
+    { label: "Contact", id: "contact", action: () => { 
+      if (currentView !== 'home') {
+        setView('home');
+        setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100);
+      } else {
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }},
+  ];
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed inset-0 z-[100] bg-surface-container-lowest flex flex-col p-6"
+        >
+          <div className="flex justify-between items-center max-w-3xl mx-auto w-full py-4">
+            <span className="font-headline font-black text-xl tracking-tighter">Menu</span>
+            <button 
+              onClick={onClose}
+              className="p-2 hover:bg-surface-container-low rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full space-y-8">
+            {navItems.map((item, i) => (
+              <motion.button
+                key={item.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                onClick={() => {
+                  item.action();
+                  onClose();
+                }}
+                className="text-left group"
+              >
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-secondary group-hover:text-primary transition-colors">0{i + 1}</span>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tighter group-hover:translate-x-4 transition-transform duration-500">
+                  {item.label}
+                </h2>
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="max-w-3xl mx-auto w-full py-12 border-t border-outline-variant/10 flex justify-between items-center">
+            <div className="flex gap-6">
+              <a href="https://linkedin.com/in/biswashanti" target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-primary transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a href="mailto:biswashantimohapatra@gmail.com" className="text-secondary hover:text-primary transition-colors">
+                <Mail size={20} />
+              </a>
+            </div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">© 2024 Biswashanti</p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const Hero = ({ setView }: { setView: (v: string) => void }) => (
   <section className="pt-32 px-6 space-y-8 max-w-3xl mx-auto">
     <div className="space-y-4">
       <motion.h1 
@@ -65,6 +165,25 @@ const Hero = () => (
         Bridging the gap between systematic code and intuitive user experiences through the lens of an Algorithmic Curator.
       </motion.p>
     </div>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="flex flex-wrap gap-4"
+    >
+      <button 
+        onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+        className="h-12 bg-primary text-on-tertiary px-8 rounded-2xl font-bold hover:opacity-90 transition-all"
+      >
+        View Projects
+      </button>
+      <button 
+        onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+        className="h-12 border border-outline-variant/30 text-primary px-8 rounded-2xl font-semibold hover:bg-surface-container-low transition-all"
+      >
+        Contact Me
+      </button>
+    </motion.div>
   </section>
 );
 
@@ -127,9 +246,6 @@ const Projects = ({ onOpenCaseStudy }: { onOpenCaseStudy: () => void }) => (
   <section id="projects" className="px-6 max-w-3xl mx-auto mt-20 space-y-8">
     <div className="flex items-end justify-between">
       <h2 className="text-2xl font-bold tracking-tight">Featured Work</h2>
-      <button className="text-on-tertiary-container text-sm font-semibold flex items-center gap-1 hover:underline transition-all">
-        View Archive <ArrowRight size={14} />
-      </button>
     </div>
 
     <motion.div 
@@ -170,7 +286,7 @@ const Projects = ({ onOpenCaseStudy }: { onOpenCaseStudy: () => void }) => (
 );
 
 const Contact = () => (
-  <section className="px-6 max-w-3xl mx-auto py-24 text-center space-y-12">
+  <section id="contact" className="px-6 max-w-3xl mx-auto py-24 text-center space-y-12">
     <div className="space-y-4">
       <h2 className="text-4xl font-black tracking-tighter">Let's build something logical.</h2>
       <p className="text-secondary">Available for new opportunities and collaborations.</p>
@@ -288,7 +404,7 @@ const BottomNav = ({ view, setView }: { view: string, setView: (v: string) => vo
   </nav>
 );
 
-const CaseStudyView = () => (
+const CaseStudyView = ({ setView }: { setView: (v: string) => void, key?: string }) => (
   <motion.div 
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -384,7 +500,7 @@ const CaseStudyView = () => (
         </div>
 
         <div className="space-y-8">
-          <div className="bg-surface-container-lowest p-8 rounded-3xl space-y-6 relative overflow-hidden">
+          <div id="research-findings" className="bg-surface-container-lowest p-8 rounded-3xl space-y-6 relative overflow-hidden">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-tertiary-container">
               <Search size={14} /> Key Research Finding
             </div>
@@ -392,7 +508,18 @@ const CaseStudyView = () => (
             <p className="text-secondary leading-relaxed">
               The "Paradox of Choice" in travel leads to decision fatigue. Users spend an average of 45 days and visit 38 sites before booking a single trip.
             </p>
-            <button className="text-on-tertiary-container text-sm font-bold flex items-center gap-1">
+            <button 
+              onClick={() => {
+                const researchSection = document.getElementById('research-findings');
+                if (researchSection) {
+                  researchSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  // Fallback if ID not found yet
+                  window.scrollTo({ top: 1200, behavior: 'smooth' });
+                }
+              }}
+              className="text-on-tertiary-container text-sm font-bold flex items-center gap-1 hover:underline"
+            >
               View quantitative data <ArrowRight size={14} />
             </button>
             <div className="absolute -bottom-4 -right-4 opacity-5">
@@ -539,7 +666,12 @@ const CaseStudyView = () => (
                         <p className="font-bold">2 Adults</p>
                       </div>
                    </div>
-                   <button className="w-full bg-primary text-on-tertiary py-3 rounded-xl text-[10px] font-bold">Confirm Booking</button>
+                   <button 
+                     onClick={() => alert('Booking flow simulated!')}
+                     className="w-full bg-primary text-on-tertiary py-3 rounded-xl text-[10px] font-bold hover:opacity-90 transition-all"
+                   >
+                     Confirm Booking
+                   </button>
                 </div>
              </div>
           </div>
@@ -617,8 +749,28 @@ const CaseStudyView = () => (
       <div className="bg-surface-container-low p-12 rounded-3xl text-center space-y-8">
         <h3 className="text-3xl font-black tracking-tighter leading-tight">Ready to curate the next big experience?</h3>
         <div className="flex flex-col gap-4 max-w-xs mx-auto">
-          <button className="h-14 bg-primary text-on-tertiary font-bold rounded-2xl px-8">Let's Connect</button>
-          <button className="h-14 border border-outline-variant/30 text-primary font-semibold rounded-2xl px-8">View More Projects</button>
+          <button 
+            onClick={() => {
+              setView('home');
+              setTimeout(() => {
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="h-14 bg-primary text-on-tertiary font-bold rounded-2xl px-8 hover:opacity-90 transition-all"
+          >
+            Let's Connect
+          </button>
+          <button 
+            onClick={() => {
+              setView('home');
+              setTimeout(() => {
+                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="h-14 border border-outline-variant/30 text-primary font-semibold rounded-2xl px-8 hover:bg-surface-container-low transition-all"
+          >
+            View More Projects
+          </button>
         </div>
       </div>
     </section>
@@ -627,6 +779,7 @@ const CaseStudyView = () => (
 
 export default function App() {
   const [view, setView] = useState('home');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Scroll to top on view change
   useEffect(() => {
@@ -635,7 +788,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <Header view={view} setView={setView} />
+      <Header view={view} setView={setView} setIsMenuOpen={setIsMenuOpen} />
+      
+      <MenuOverlay 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)} 
+        setView={setView}
+        currentView={view}
+      />
       
       <AnimatePresence mode="wait">
         {view === 'home' ? (
@@ -646,14 +806,14 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="pb-32"
           >
-            <Hero />
+            <Hero setView={setView} />
             <About />
             <Skills />
             <Projects onOpenCaseStudy={() => setView('case-study')} />
             <Contact />
           </motion.div>
         ) : (
-          <CaseStudyView key="case-study" />
+          <CaseStudyView key="case-study" setView={setView} />
         )}
       </AnimatePresence>
 
